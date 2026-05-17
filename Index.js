@@ -23,6 +23,7 @@ async function run() {
     await client.connect();
     const db = client.db('wandertust')
     const destinationCollection = db.collection('destination')
+    const bookingCollection = db.collection('bookings')
     app.post('/destination', async (req, res) => {
       const newDestination = req.body;
       const result = await destinationCollection.insertOne(newDestination)
@@ -37,21 +38,44 @@ async function run() {
       const result = await destinationCollection.findOne({ _id: new ObjectId(id) })
       res.send(result)
     })
-    app.patch('/destination/:id', async(req, res) => {
-       const id = req.params.id;
-       const updatedDestination = req.body;
+    app.patch('/destination/:id', async (req, res) => {
+      const id = req.params.id;
+      const updatedDestination = req.body;
       const result = await destinationCollection.updateOne(
         { _id: new ObjectId(id) },
-        {$set :updatedDestination}
+        { $set: updatedDestination }
       )
       res.send(result)
     })
-    app.delete('/destination/:id', async(req, res) => {
-       const id = req.params.id;
+    app.delete('/destination/:id', async (req, res) => {
+      const id = req.params.id;
       const result = await destinationCollection.deleteOne({ _id: new ObjectId(id) })
       res.send(result)
     })
-
+    app.post('/bookings', async (req, res) => {
+      const newBooking = req.body;
+      const result = await bookingCollection.insertOne(newBooking);
+      res.json(result)
+    })
+    app.get('/bookings', async (req, res) => {
+      const id = req.params.id;
+      const result = await bookingCollection.find().toArray()
+      res.send(result)
+    })
+    app.get('/bookings/:userId', async (req, res) => {
+      const userId = req.params.userId;
+      const result = await bookingCollection.find({
+        userId: { $eq: userId }
+      }).toArray()
+      res.send(result)
+    })
+    app.delete('/bookings/:id', async (req, res) => {
+      const id = req.params.id;
+      const result = await bookingCollection.deleteOne({
+        _id : new ObjectId(id)
+      })
+      res.send(result)
+    })
 
 
 
